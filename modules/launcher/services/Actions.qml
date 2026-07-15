@@ -21,7 +21,16 @@ Searcher {
     Variants {
         id: variants
 
-        model: GlobalConfig.launcher.actions.filter(a => (a.enabled ?? true) && (GlobalConfig.launcher.enableDangerousActions || !(a.dangerous ?? false)))
+        model: {
+            const actions = GlobalConfig.launcher.actions.filter(a => (a.enabled ?? true) && (GlobalConfig.launcher.enableDangerousActions || !(a.dangerous ?? false)));
+            actions.push({
+                name: qsTr("Toggle mirror view"),
+                icon: "screen_share",
+                description: qsTr("Mirror the laptop to the connected external display"),
+                command: [Quickshell.env("HOME") + "/.local/bin/caelestia-toggle-mirror"]
+            });
+            return actions;
+        }
 
         Action {}
     }
