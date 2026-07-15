@@ -33,7 +33,8 @@ RowLayout {
         id: indicator
 
         Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-        Layout.preferredWidth: Tokens.sizes.bar.innerHeight - Tokens.padding.small
+        Layout.preferredWidth: Tokens.sizes.bar.innerWidth - Tokens.padding.small
+        Layout.preferredHeight: Math.round(Tokens.sizes.bar.innerWidth * 0.68)
 
         animate: true
         text: {
@@ -48,7 +49,7 @@ RowLayout {
             const label = Config.bar.workspaces.label || displayName;
             const occupiedLabel = Config.bar.workspaces.occupiedLabel || label;
             const activeLabel = Config.bar.workspaces.activeLabel || (root.isOccupied ? occupiedLabel : label);
-            return root.activeWsId === root.ws ? activeLabel : root.isOccupied ? occupiedLabel : label;
+            return (root.activeWsId === root.ws ? activeLabel : root.isOccupied ? occupiedLabel : label).trim();
         }
         color: Config.bar.workspaces.occupiedBg || root.isOccupied || root.activeWsId === root.ws ? Colours.palette.m3onSurface : Colours.layer(Colours.palette.m3outlineVariant, 2)
         horizontalAlignment: Text.AlignHCenter
@@ -63,7 +64,7 @@ RowLayout {
 
         Layout.alignment: Qt.AlignVCenter
         Layout.fillWidth: true
-        Layout.leftMargin: -Tokens.sizes.bar.innerHeight / 10
+        Layout.leftMargin: -Tokens.sizes.bar.innerWidth / 10
 
         visible: active
         active: root.hasWindows
@@ -104,6 +105,7 @@ RowLayout {
                 MaterialIcon {
                     required property var modelData
 
+                    verticalAlignment: Text.AlignVCenter
                     grade: 0
                     text: Icons.getAppCategoryIcon(modelData.lastIpcObject.class, "terminal")
                     color: Colours.palette.m3onSurfaceVariant

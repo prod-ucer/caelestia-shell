@@ -38,6 +38,12 @@ Searcher {
         Quickshell.execDetached(["caelestia", "wallpaper", "-f", path, ...smartArg]);
     }
 
+    function setBootWallpaper(path: string): void {
+        actualCurrent = path;
+        // Boot rotation always refreshes the wallpaper-derived scheme and mode.
+        Quickshell.execDetached(["caelestia", "wallpaper", "-f", path]);
+    }
+
     function preview(path: string): void {
         previewPath = path;
         showPreview = true;
@@ -121,5 +127,23 @@ Searcher {
                 Colours.showPreview = true;
             }
         }
+    }
+
+    Process {
+        id: randomBootWallpaperProc
+
+        command: [Quickshell.shellPath("scripts/random-wallpaper-on-boot.py"), Paths.wallsdir, `${Paths.state}/wallpaper/boot-shuffle.json`]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const path = text.trim();
+                if (path)
+                    root.setBootWallpaper(path);
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        if (GlobalConfig.background.randomWallpaperOnBoot)
+            randomBootWallpaperProc.running = true;
     }
 }

@@ -289,7 +289,7 @@ Item {
             asynchronous: true
 
             Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-            Layout.preferredWidth: Tokens.sizes.bar.innerHeight - Tokens.padding.small
+            Layout.preferredWidth: Tokens.sizes.bar.innerWidth - Tokens.padding.small
 
             sourceComponent: ws.icon.length === 1 ? letterComp : iconComp
 

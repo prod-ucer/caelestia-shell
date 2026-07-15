@@ -159,7 +159,8 @@ class BarTokens : public ConfigObject {
     Q_OBJECT
     QML_ANONYMOUS
 
-    CONFIG_PROPERTY(int, innerHeight, 40)
+    // The topbar fork uses the bar's cross-axis size as a width token.
+    CONFIG_PROPERTY(int, innerWidth, 40)
     CONFIG_PROPERTY(int, windowPreviewSize, 400)
     CONFIG_PROPERTY(int, trayMenuWidth, 300)
     CONFIG_PROPERTY(int, batteryWidth, 250)

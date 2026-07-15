@@ -4,6 +4,7 @@ import Quickshell
 import Caelestia.Config
 import qs.components
 import qs.components.controls
+import qs.services
 import qs.modules.bar as Bar
 import qs.modules.bar.popouts as BarPopouts
 
@@ -22,6 +23,7 @@ CustomMouseArea {
     property bool dashboardShortcutActive
     property bool osdShortcutActive
     property bool utilitiesShortcutActive
+    property bool sidebarHotCornerActive
 
     function withinPanelHeight(panel: Item, x: real, y: real): bool {
         const panelY = root.borderThickness + panel.y;
@@ -86,8 +88,10 @@ CustomMouseArea {
             if (Config.bar.showOnHover)
                 bar.isHovered = false;
 
-            if (Config.sidebar.showOnHover)
+            if (Config.sidebar.showOnHover || sidebarHotCornerActive) {
                 screenState.sidebar = false;
+                sidebarHotCornerActive = false;
+            }
         }
     }
 
@@ -103,6 +107,15 @@ CustomMouseArea {
         if (fullscreen) {
             root.panels.osd.hovered = inRightPanel(panels.osdWrapper, x, y);
             return;
+        }
+
+        // The bottom edge of the bar is a hard boundary between drawer hover
+        // handling and bar popouts. Crossing it upward closes hover drawers first.
+        const belowBar = y >= bar.clampedHeight;
+        if (!belowBar && sidebarHotCornerActive) {
+            sidebarHotCornerActive = false;
+            screenState.sidebar = false;
+            screenState.utilities = false;
         }
 
         // Show bar in non-exclusive mode on hover
@@ -227,7 +240,20 @@ CustomMouseArea {
         }
 
         // Show utilities on hover
-        const showUtilities = inBottomPanel(panels.utilities, x, y, true);
+        const showUtilities = belowBar && inBottomPanel(panels.utilities, x, y, true);
+
+        // The bottom-right hot corner reveals both utilities and the notification sidebar.
+        // Keep the sidebar open while the pointer moves from the corner into either drawer.
+        const inHotCornerSidebar = belowBar && (inRightPanel(panels.sidebar, x, y) || showUtilities);
+        if (showUtilities) {
+            sidebarHotCornerActive = true;
+            screenState.sidebar = true;
+            popouts.hasCurrent = false;
+            bar.closeTray();
+        } else if (sidebarHotCornerActive && !inHotCornerSidebar) {
+            sidebarHotCornerActive = false;
+            screenState.sidebar = false;
+        }
 
         // Always update visibility based on hover if not in shortcut mode
         if (!utilitiesShortcutActive) {
@@ -305,6 +331,19 @@ CustomMouseArea {
             } else {
                 // Utilities hidden, clear shortcut flag
                 root.utilitiesShortcutActive = false;
+            }
+        }
+
+
+        function onSidebarChanged() {
+            if (root.screenState.sidebar) {
+                // The notification centre now owns presentation; retain entries,
+                // but immediately remove any transient popup copies.
+                Notifs.dismissPopups();
+                root.popouts.hasCurrent = false;
+                root.bar.closeTray();
+            } else {
+                root.sidebarHotCornerActive = false;
             }
         }
 

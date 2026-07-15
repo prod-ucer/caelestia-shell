@@ -37,6 +37,11 @@ Singleton {
         return true;
     }
 
+    function dismissPopups(): void {
+        for (const notif of popups)
+            notif.popup = false;
+    }
+
     onDndChanged: {
         if (!GlobalConfig.utilities.toasts.dndChanged)
             return;

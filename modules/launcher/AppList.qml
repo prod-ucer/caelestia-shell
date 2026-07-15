@@ -15,6 +15,40 @@ StyledListView {
 
     required property SearchBar search
     required property ScreenState screenState
+    property string queryState: "apps"
+
+    function stateForText(text: string): string {
+        const prefix = GlobalConfig.launcher.actionPrefix;
+        if (text.startsWith(prefix)) {
+            for (const action of ["calc", "scheme", "variant"])
+                if (text.startsWith(`${prefix}${action} `))
+                    return action;
+
+            return "actions";
+        }
+
+        return "apps";
+    }
+
+    function refreshResults(): void {
+        switch (state) {
+        case "apps":
+            model.values = Apps.search(search.text);
+            break;
+        case "actions":
+            model.values = Actions.query(search.text);
+            break;
+        case "calc":
+            model.values = [0];
+            break;
+        case "scheme":
+            model.values = Schemes.query(search.text);
+            break;
+        case "variant":
+            model.values = M3Variants.query(search.text);
+            break;
+        }
+    }
 
     model: ScriptModel {
         id: model
@@ -45,23 +79,26 @@ StyledListView {
         }
     }
 
-    state: {
-        const text = search.text;
-        const prefix = GlobalConfig.launcher.actionPrefix;
-        if (text.startsWith(prefix)) {
-            for (const action of ["calc", "scheme", "variant"])
-                if (text.startsWith(`${prefix}${action} `))
-                    return action;
-
-            return "actions";
-        }
-
-        return "apps";
-    }
+    state: stateForText(search.text)
 
     onStateChanged: {
         if (state === "scheme" || state === "variant")
             Schemes.reload();
+    }
+
+    Connections {
+        target: root.search
+        function onTextChanged(): void {
+            const nextState = root.stateForText(root.search.text);
+
+            // State transitions update the model and delegate together. Only
+            // refresh manually while staying in one state (e.g. ">" to
+            // ">Sch"), otherwise the old delegate can briefly render the new
+            // model.
+            if (nextState === root.queryState)
+                Qt.callLater(root.refreshResults);
+            root.queryState = nextState;
+        }
     }
 
     states: [

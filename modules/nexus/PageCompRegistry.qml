@@ -38,6 +38,14 @@ QtObject {
                 }
             }
         },
+        Component {
+            // Lock overlay
+            StackPage {
+                Component {
+                    LockOverlayPage {}
+                }
+            }
+        },
 
         // Connectivity
         Component {

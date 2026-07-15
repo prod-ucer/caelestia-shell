@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Layouts
 import Caelestia.Config
 import qs.components
 import qs.services
@@ -28,15 +29,15 @@ Item {
 
     readonly property int maxWidth: {
         const otherModules = bar.children.filter(c => c.entryId && c.item !== this && c.entryId !== "spacer");
-        const otherWidth = otherModules.reduce((acc, curr) => acc + (curr.item.nonAnimHeight ?? curr.width), 0);
+        const otherWidth = otherModules.reduce((acc, curr) => acc + (curr.item.nonAnimWidth ?? curr.width), 0);
         // Length - 2 cause repeater counts as a child
         return bar.width - otherWidth - bar.spacing * (bar.children.length - 1) - bar.hPadding * 2;
     }
     property Title current: text1
 
     clip: true
-    implicitWidth: icon.implicitWidth + current.implicitWidth + current.anchors.leftMargin
-    implicitHeight: Math.max(icon.implicitWidth, current.implicitHeight)
+    implicitWidth: icon.implicitWidth + current.implicitWidth + layout.spacing
+    implicitHeight: Math.max(icon.implicitHeight, current.implicitHeight)
 
     Loader {
         asynchronous: true
@@ -64,22 +65,35 @@ Item {
         }
     }
 
-    MaterialIcon {
-        id: icon
+    RowLayout {
+        id: layout
 
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.fill: parent
+        spacing: Tokens.spacing.small
 
-        animate: true
-        text: Icons.getAppCategoryIcon(Hypr.activeToplevel?.lastIpcObject.class, "desktop_windows")
-        color: root.colour
-    }
+        MaterialIcon {
+            id: icon
 
-    Title {
-        id: text1
-    }
+            Layout.alignment: Qt.AlignVCenter
+            verticalAlignment: Text.AlignVCenter
+            animate: true
+            text: Icons.getAppCategoryIcon(Hypr.activeToplevel?.lastIpcObject.class, "desktop_windows")
+            color: root.colour
+        }
 
-    Title {
-        id: text2
+        Item {
+            Layout.alignment: Qt.AlignVCenter
+            implicitWidth: root.current.implicitWidth
+            implicitHeight: root.implicitHeight
+
+            Title {
+                id: text1
+            }
+
+            Title {
+                id: text2
+            }
+        }
     }
 
     TextMetrics {
@@ -88,7 +102,7 @@ Item {
         text: root.windowTitle
         font: root.Tokens.font.body.builders.small.letterSpacing(1.4).build()
         elide: Qt.ElideRight
-        elideWidth: root.maxWidth - icon.width
+        elideWidth: Math.max(0, root.maxWidth - icon.implicitWidth - layout.spacing)
 
         onTextChanged: {
             const next = root.current === text1 ? text2 : text1;
@@ -105,14 +119,13 @@ Item {
     component Title: StyledText {
         id: text
 
-        anchors.verticalCenter: icon.verticalCenter
-        anchors.left: icon.right
-        anchors.leftMargin: Tokens.spacing.small
+        anchors.fill: parent
 
         font: metrics.font
         color: root.colour
         opacity: root.current === this ? 1 : 0
         horizontalAlignment: Text.AlignLeft
+        verticalAlignment: Text.AlignVCenter
 
         transform: [
             Translate {
@@ -124,9 +137,6 @@ Item {
             //     origin.y: text.implicitHeight / 2
             // }
         ]
-
-        width: implicitWidth
-        height: implicitHeight
 
         Behavior on opacity {
             Anim {

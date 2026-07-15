@@ -79,6 +79,8 @@ Searcher {
 
         function onClicked(list: AppList): void {
             list.screenState.launcher = false;
+            // An explicit choice should survive later wallpaper changes.
+            GlobalConfig.services.smartScheme = false;
             Quickshell.execDetached(["caelestia", "scheme", "set", "-v", variant]);
         }
     }

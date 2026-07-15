@@ -17,7 +17,19 @@ RowLayout {
     required property ScreenState screenState
     required property BarPopouts.Wrapper popouts
     required property bool fullscreen
+    required property int contentHeight
     readonly property int hPadding: Tokens.padding.large
+
+    // The bar itself owns the boundary event because an open sidebar masks the
+    // drawers' full-screen interaction layer along the right edge.
+    HoverHandler {
+        onHoveredChanged: {
+            if (hovered) {
+                root.screenState.sidebar = false;
+                root.screenState.utilities = false;
+            }
+        }
+    }
 
     function closeTray(): void {
         if (!Config.bar.tray.compact)
@@ -128,6 +140,8 @@ RowLayout {
                 delegate: EntryWrapper {
                     OsIcon {
                         objectName: "taskbarLogo"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenterOffset: 1
                     }
                 }
             }
@@ -136,6 +150,7 @@ RowLayout {
                 delegate: EntryWrapper {
                     Workspaces {
                         objectName: "taskbarWorkspaces"
+                        anchors.verticalCenter: parent.verticalCenter
                         screen: root.screen
                         fullscreen: root.fullscreen
                     }
@@ -146,6 +161,7 @@ RowLayout {
                 delegate: EntryWrapper {
                     ActiveWindow {
                         objectName: "taskbarActiveWindow"
+                        anchors.verticalCenter: parent.verticalCenter
                         bar: root
                         monitor: Brightness.getMonitorForScreen(root.screen)
                     }
@@ -156,6 +172,7 @@ RowLayout {
                 delegate: EntryWrapper {
                     Tray {
                         objectName: "taskbarTray"
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                 }
             }
@@ -164,6 +181,7 @@ RowLayout {
                 delegate: EntryWrapper {
                     Mail {
                         objectName: "taskbarMail"
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                 }
             }
@@ -172,6 +190,7 @@ RowLayout {
                 delegate: EntryWrapper {
                     Clock {
                         objectName: "taskbarClock"
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                 }
             }
@@ -180,6 +199,7 @@ RowLayout {
                 delegate: EntryWrapper {
                     StatusIcons {
                         objectName: "taskbarStatusIcons"
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                 }
             }
@@ -188,6 +208,7 @@ RowLayout {
                 delegate: EntryWrapper {
                     Power {
                         objectName: "taskbarPowerButton"
+                        anchors.verticalCenter: parent.verticalCenter
                         screenState: root.screenState
                     }
                 }
@@ -206,7 +227,7 @@ RowLayout {
         Layout.alignment: Qt.AlignVCenter
 
         implicitWidth: item?.implicitWidth ?? 0
-        implicitHeight: item?.implicitHeight ?? 0
+        implicitHeight: root.contentHeight
 
         children: item
     }

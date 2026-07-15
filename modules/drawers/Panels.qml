@@ -70,7 +70,7 @@ Item {
         sessionPanel: sessionWrapper
         utilitiesPanel: utilities
 
-        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         anchors.right: parent.right
     }
 
@@ -147,9 +147,8 @@ Item {
 
         screenState: root.screenState
 
-        anchors.top: notifications.bottom
+        anchors.top: parent.top
         anchors.bottom: utilities.top
         anchors.right: parent.right
-        anchors.topMargin: -notifications.anchors.topMargin
     }
 }

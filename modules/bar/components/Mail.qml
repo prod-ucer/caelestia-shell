@@ -20,7 +20,7 @@ StyledRect {
 
     clip: true
     implicitWidth: Config.bar.mail.enabled ? mailRow.implicitWidth + Tokens.padding.medium * 2 : 0
-    implicitHeight: Config.bar.mail.enabled ? Tokens.sizes.bar.innerHeight : 0
+    implicitHeight: Config.bar.mail.enabled ? Math.round(Tokens.sizes.bar.innerWidth * 0.68) : 0
     visible: Config.bar.mail.enabled
     enabled: Config.bar.mail.enabled
 

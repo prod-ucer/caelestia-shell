@@ -38,7 +38,7 @@ StyledRect {
             urgency: hasCritical ? "critical" : hasNormal ? "normal" : "low"
         };
     }
-    readonly property string image: props.img
+    readonly property string image: Config.lock.hideNotifDetails ? "" : props.img
     readonly property string appIcon: props.icon
     readonly property string urgency: props.urgency
 
@@ -174,8 +174,8 @@ StyledRect {
                     color: root.urgency === "critical" ? Colours.palette.m3error : Colours.layer(Colours.palette.m3surfaceContainerHighest, 2)
                     radius: Tokens.rounding.full
 
-                    opacity: root.notifs.length > Config.notifs.groupPreviewNum ? 1 : 0
-                    Layout.preferredWidth: root.notifs.length > Config.notifs.groupPreviewNum ? implicitWidth : 0
+                    opacity: !Config.lock.hideNotifDetails && root.notifs.length > Config.notifs.groupPreviewNum ? 1 : 0
+                    Layout.preferredWidth: opacity > 0 ? implicitWidth : 0
 
                     StateLayer {
                         color: root.urgency === "critical" ? Colours.palette.m3onError : Colours.palette.m3onSurface
@@ -219,8 +219,9 @@ StyledRect {
             }
 
             Repeater {
+                visible: !Config.lock.hideNotifDetails
                 model: ScriptModel {
-                    values: root.notifs.slice(0, root.Config.notifs.groupPreviewNum)
+                    values: Config.lock.hideNotifDetails ? [] : root.notifs.slice(0, root.Config.notifs.groupPreviewNum)
                 }
 
                 NotifLine {
@@ -278,8 +279,8 @@ StyledRect {
                 asynchronous: true
                 Layout.fillWidth: true
 
-                opacity: root.expanded ? 1 : 0
-                Layout.preferredHeight: root.expanded ? implicitHeight : 0
+                opacity: root.expanded && !Config.lock.hideNotifDetails ? 1 : 0
+                Layout.preferredHeight: opacity > 0 ? implicitHeight : 0
                 active: opacity > 0
 
                 sourceComponent: ColumnLayout {

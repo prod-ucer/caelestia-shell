@@ -20,14 +20,13 @@ StyledRect {
     radius: Tokens.rounding.full
 
     clip: true
-    implicitWidth: iconColumn.implicitWidth + Tokens.padding.medium * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.spacing : 0)
-    implicitHeight: Tokens.sizes.bar.innerHeight
+    implicitWidth: iconColumn.implicitWidth + Tokens.padding.medium * 2
+    implicitHeight: Math.round(Tokens.sizes.bar.innerWidth * 0.68)
 
     RowLayout {
         id: iconColumn
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: Tokens.padding.medium
 
@@ -113,6 +112,7 @@ StyledRect {
             active: Config.bar.status.showAudio
 
             sourceComponent: MaterialIcon {
+                verticalAlignment: Text.AlignVCenter
                 animate: true
                 text: Icons.getVolumeIcon(Audio.volume, Audio.muted)
                 color: root.colour
@@ -125,6 +125,7 @@ StyledRect {
             active: Config.bar.status.showMicrophone
 
             sourceComponent: MaterialIcon {
+                verticalAlignment: Text.AlignVCenter
                 animate: true
                 text: Icons.getMicVolumeIcon(Audio.sourceVolume, Audio.sourceMuted)
                 color: root.colour
@@ -137,6 +138,7 @@ StyledRect {
             active: Config.bar.status.showKbLayout
 
             sourceComponent: StyledText {
+                verticalAlignment: Text.AlignVCenter
                 animate: true
                 text: Hypr.kbLayout
                 color: root.colour
@@ -150,6 +152,7 @@ StyledRect {
             active: Config.bar.status.showNetwork && (!Nmcli.activeEthernet || Config.bar.status.showWifi)
 
             sourceComponent: MaterialIcon {
+                verticalAlignment: Text.AlignVCenter
                 animate: true
                 text: Nmcli.active ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : "wifi_off"
                 color: root.colour
@@ -162,6 +165,7 @@ StyledRect {
             active: Config.bar.status.showNetwork && Nmcli.activeEthernet
 
             sourceComponent: MaterialIcon {
+                verticalAlignment: Text.AlignVCenter
                 animate: true
                 text: "cable"
                 color: root.colour
@@ -170,7 +174,7 @@ StyledRect {
 
         // Bluetooth section
         WrappedLoader {
-            Layout.preferredHeight: implicitHeight
+            Layout.alignment: Qt.AlignVCenter
 
             name: "bluetooth"
             active: Config.bar.status.showBluetooth
@@ -180,6 +184,8 @@ StyledRect {
 
                 // Bluetooth icon
                 MaterialIcon {
+                    Layout.alignment: Qt.AlignVCenter
+                    verticalAlignment: Text.AlignVCenter
                     animate: true
                     text: {
                         if (!Bluetooth.defaultAdapter?.enabled) // qmllint disable unresolved-type
@@ -201,6 +207,9 @@ StyledRect {
                         id: device
 
                         required property BluetoothDevice modelData
+
+                        Layout.alignment: Qt.AlignVCenter
+                        verticalAlignment: Text.AlignVCenter
 
                         animate: true
                         text: Icons.getBluetoothIcon(modelData?.icon)
@@ -240,6 +249,7 @@ StyledRect {
             active: Config.bar.status.showBattery
 
             sourceComponent: MaterialIcon {
+                verticalAlignment: Text.AlignVCenter
                 animate: true
                 text: {
                     if (!UPower.displayDevice.isLaptopBattery) {
@@ -261,7 +271,8 @@ StyledRect {
         required property string name
 
         asynchronous: true
-        Layout.alignment: Qt.AlignHCenter
+        Layout.alignment: Qt.AlignVCenter
+        Layout.preferredHeight: root.implicitHeight
         visible: active
     }
 }

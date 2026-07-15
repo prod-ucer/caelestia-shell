@@ -19,7 +19,7 @@ Item {
 
     readonly property int clampedHeight: Math.max(Config.border.minThickness, implicitHeight)
     readonly property int padding: Math.max(Tokens.padding.small, Config.border.thickness)
-    readonly property int contentHeight: Tokens.sizes.bar.innerHeight + padding * 2
+    readonly property int contentHeight: Math.round(Tokens.sizes.bar.innerWidth * 0.68) + padding * 2
     readonly property int exclusiveZone: !disabled && (Config.bar.persistent || screenState.bar) ? contentHeight : Config.border.thickness
     readonly property bool shouldBeVisible: !fullscreen && !disabled && (Config.bar.persistent || screenState.bar || isHovered)
     property bool isHovered
@@ -82,6 +82,7 @@ Item {
 
         sourceComponent: Bar {
             height: root.contentHeight
+            contentHeight: root.contentHeight - root.padding * 2
             screen: root.screen
             screenState: root.screenState
             popouts: root.popouts // qmllint disable incompatible-type

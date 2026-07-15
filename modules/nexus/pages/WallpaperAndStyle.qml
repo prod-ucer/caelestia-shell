@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Caelestia.Components
 import Caelestia.Config
 import qs.components
@@ -179,6 +180,14 @@ PageBase {
 
         ToggleRow {
             Layout.topMargin: Tokens.spacing.extraSmall / 2 - parent.spacing
+            text: qsTr("Random wallpaper on boot")
+            subtext: qsTr("Avoid recent wallpapers and update colours automatically")
+            checked: GlobalConfig.background.randomWallpaperOnBoot
+            onToggled: GlobalConfig.background.randomWallpaperOnBoot = checked
+        }
+
+        ToggleRow {
+            Layout.topMargin: Tokens.spacing.extraSmall / 2 - parent.spacing
 
             text: qsTr("Transparency")
             subtext: qsTr("Base %1, layers %2").arg(Colours.transparency.base).arg(Colours.transparency.layers)
@@ -186,13 +195,36 @@ PageBase {
             onToggled: GlobalConfig.appearance.transparency.enabled = checked
         }
 
+        StepperRow {
+            Layout.topMargin: Tokens.spacing.extraSmall / 2 - parent.spacing
+            visible: Colours.transparency.enabled
+
+            label: qsTr("Base opacity")
+            subtext: qsTr("Opacity of background surfaces")
+            value: Math.round(GlobalConfig.appearance.transparency.base * 100)
+            from: 0
+            to: 100
+            stepSize: 5
+            onMoved: v => GlobalConfig.appearance.transparency.base = v / 100
+        }
+
         ToggleRow {
             Layout.topMargin: Tokens.spacing.extraSmall / 2 - parent.spacing
 
-            last: true
             text: qsTr("Dark theme")
             checked: !Colours.light
             onToggled: Colours.setMode(checked ? "dark" : "light")
+        }
+
+        ToggleRow {
+            last: true
+            text: qsTr("Auto colour scheme based on wallpaper")
+            subtext: qsTr("Generate colours and mode from the current wallpaper")
+            checked: Colours.scheme === "dynamic"
+            onToggled: {
+                GlobalConfig.services.smartScheme = checked;
+                Quickshell.execDetached(["caelestia", "scheme", "set", "--notify", "-n", checked ? "dynamic" : "caelestia"]);
+            }
         }
     }
 }

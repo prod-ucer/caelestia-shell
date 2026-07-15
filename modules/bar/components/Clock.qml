@@ -11,10 +11,10 @@ StyledRect {
 
     readonly property color colour: Colours.palette.m3tertiary
     readonly property int padding: Config.bar.clock.background ? Tokens.padding.medium : Tokens.padding.extraSmall
-    readonly property var font: Tokens.font.body.builders.small.scale(1.1)
+    readonly property var font: Tokens.font.body.builders.small.scale(1.0)
 
     implicitWidth: layout.implicitWidth + root.padding * 2
-    implicitHeight: Tokens.sizes.bar.innerHeight
+    implicitHeight: Math.round(Tokens.sizes.bar.innerWidth * 0.68)
 
     color: Qt.alpha(Colours.tPalette.m3surfaceContainer, Config.bar.clock.background ? Colours.tPalette.m3surfaceContainer.a : 0)
     radius: Tokens.rounding.full
@@ -32,6 +32,7 @@ StyledRect {
             visible: active
 
             sourceComponent: MaterialIcon {
+                verticalAlignment: Text.AlignVCenter
                 text: "calendar_month"
                 color: root.colour
             }
@@ -45,11 +46,13 @@ StyledRect {
 
             sourceComponent: RowLayout {
                 spacing: layout.spacing
+                Layout.alignment: Qt.AlignVCenter
 
                 StyledText {
                     id: dateText
 
                     Layout.alignment: Qt.AlignVCenter
+                    verticalAlignment: Text.AlignVCenter
                     text: Time.format("ddd")
                     font: root.font.build()
                     color: root.colour
@@ -57,6 +60,7 @@ StyledRect {
 
                 StyledText {
                     Layout.alignment: Qt.AlignVCenter
+                    verticalAlignment: Text.AlignVCenter
                     text: Time.format("d")
                     font: root.font.build()
                     color: root.colour
@@ -72,65 +76,55 @@ StyledRect {
             color: Qt.alpha(root.colour, 0.5)
         }
 
-        StyledText {
-            id: hourText
-
+        RowLayout {
             Layout.alignment: Qt.AlignVCenter
-            Layout.rightMargin: 0
-            text: Time.hourStr
-            font: {
-                const scale = text === "11" ? 1.15 : Math.min(1.05, Math.max(hourMetrics.height, minMetrics.height) / hourMetrics.width);
-                return root.font.width(scale * 100).letterSpacing(scale).build();
-            }
-            color: root.colour
+            spacing: 0
 
-            TextMetrics {
-                id: hourMetrics
+            StyledText {
+                id: hourText
 
-                font: root.font.build()
+                Layout.alignment: Qt.AlignVCenter
                 text: Time.hourStr
-            }
-        }
-
-        StyledText {
-            Layout.alignment: Qt.AlignVCenter
-            Layout.leftMargin: -parent.spacing
-            Layout.rightMargin: -parent.spacing
-            text: ":"
-            font: root.font.build()
-            color: root.colour
-        }
-
-        StyledText {
-            Layout.leftMargin: -parent.spacing
-            Layout.rightMargin: -parent.spacing - 4
-            Layout.alignment: Qt.AlignVCenter
-            text: Time.minuteStr
-            font: {
-                const scale = text === "11" ? 1.15 : Math.min(1.05, Math.max(hourMetrics.height, minMetrics.height) / minMetrics.width);
-                return root.font.width(scale * 100).letterSpacing(scale).build();
-            }
-            color: root.colour
-
-            TextMetrics {
-                id: minMetrics
-
+                verticalAlignment: Text.AlignVCenter
                 font: root.font.build()
-                text: Time.minuteStr
-            }
-        }
-
-        Loader {
-            Layout.rightMargin: -parent.spacing - 4
-            Layout.alignment: Qt.AlignVCenter
-            asynchronous: true
-            active: GlobalConfig.services.useTwelveHourClock
-            visible: active
-
-            sourceComponent: StyledText {
-                text: Time.amPmStr.toLowerCase()
-                font: Tokens.font.body.builders.small.scale(0.9).build()
                 color: root.colour
+
+                TextMetrics {
+                    id: hourMetrics
+
+                    font: root.font.build()
+                    text: Time.hourStr
+                }
+            }
+
+            StyledText {
+                Layout.alignment: Qt.AlignVCenter
+                verticalAlignment: Text.AlignVCenter
+                text: ":"
+                font: root.font.build()
+                color: root.colour
+            }
+
+            StyledText {
+                Layout.alignment: Qt.AlignVCenter
+                verticalAlignment: Text.AlignVCenter
+                text: Time.minuteStr
+                font: root.font.build()
+                color: root.colour
+            }
+
+            Loader {
+                Layout.alignment: Qt.AlignVCenter
+                asynchronous: true
+                active: GlobalConfig.services.useTwelveHourClock
+                visible: active
+
+                sourceComponent: StyledText {
+                    verticalAlignment: Text.AlignVCenter
+                    text: Time.amPmStr.toLowerCase()
+                    font: Tokens.font.body.builders.small.scale(0.9).build()
+                    color: root.colour
+                }
             }
         }
     }

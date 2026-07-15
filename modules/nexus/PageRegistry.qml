@@ -13,6 +13,12 @@ QtObject {
             description: qsTr("Wallpaper, fonts, colours"),
             category: "appearance"
         },
+        {
+            label: qsTr("Lock overlay"),
+            icon: "lock",
+            description: qsTr("Privacy on the lock screen"),
+            category: "appearance"
+        },
 
         // Connectivity
         // TODO

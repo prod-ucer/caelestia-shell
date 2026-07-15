@@ -29,7 +29,7 @@ StyledClippingRect {
         }
 
         layer.enabled: true
-        opacity: status === Image.Ready ? 1 : 0
+        opacity: !Config.lock.hideMediaDetails && status === Image.Ready ? 1 : 0
 
         StyledRect {
             anchors.fill: parent
@@ -54,6 +54,7 @@ StyledClippingRect {
         spacing: Tokens.spacing.extraSmall
 
         StyledText {
+            visible: !Config.lock.hideMediaDetails
             Layout.fillWidth: true
             animate: true
             text: (Players.active?.trackTitle ?? qsTr("Nothing playing")) || qsTr("Unknown track")
@@ -64,6 +65,7 @@ StyledClippingRect {
         }
 
         StyledText {
+            visible: !Config.lock.hideMediaDetails
             Layout.fillWidth: true
             animate: true
             text: (Players.active?.trackArtist ?? qsTr("Try playing some music!")) || qsTr("Unknown artist")
@@ -75,7 +77,7 @@ StyledClippingRect {
 
         ButtonRow {
             Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: Tokens.spacing.medium
+            Layout.topMargin: Config.lock.hideMediaDetails ? 0 : Tokens.spacing.medium
 
             spacing: Tokens.spacing.extraSmall
 
