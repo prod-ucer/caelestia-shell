@@ -6,6 +6,7 @@ import Caelestia
 import Caelestia.Config
 import qs.components
 import qs.components.filedialog
+import qs.services
 import qs.utils
 
 Item {
@@ -25,8 +26,26 @@ Item {
     }
 
     readonly property real nonAnimHeight: (content.item as Content)?.nonAnimHeight ?? 0
-    readonly property bool shouldBeActive: screenState.dashboard && Config.dashboard.enabled
+    readonly property bool shouldBeActive: screenState.dashboard && Config.dashboard.enabled && !GameMode.enabled
     property real offsetScale: shouldBeActive ? 0 : 1
+
+    Connections {
+        function onEnabledChanged(): void {
+            if (GameMode.enabled)
+                root.screenState.dashboard = false;
+        }
+
+        target: GameMode
+    }
+
+    Connections {
+        function onDashboardChanged(): void {
+            if (GameMode.enabled && root.screenState.dashboard)
+                root.screenState.dashboard = false;
+        }
+
+        target: root.screenState
+    }
 
     visible: offsetScale < 1
     anchors.topMargin: (-implicitHeight - 5) * offsetScale
@@ -44,7 +63,9 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
 
-        active: root.shouldBeActive || root.visible
+        // Outside Game Mode, build the dashboard in the background and retain
+        // it for instant first/subsequent opens. Game Mode releases the cache.
+        active: !GameMode.enabled
 
         sourceComponent: Content {
             screenState: root.screenState

@@ -128,7 +128,8 @@ StyledRect {
                     delegate: Toggle {
                         icon: "gamepad"
                         checked: GameMode.enabled
-                        onClicked: GameMode.enabled = !GameMode.enabled
+                        enabled: !GameMode.transitionLocked
+                        onClicked: GameMode.toggle()
                     }
                 }
                 DelegateChoice {

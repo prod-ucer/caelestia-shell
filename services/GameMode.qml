@@ -10,7 +10,28 @@ import qs.services
 Singleton {
     id: root
 
-    property alias enabled: props.enabled
+    readonly property bool enabled: props.enabled
+    readonly property bool transitionLocked: transitionCooldown.running
+
+    function setEnabled(enabled: bool): void {
+        if (transitionLocked || props.enabled === enabled)
+            return;
+
+        props.enabled = enabled;
+        transitionCooldown.restart();
+    }
+
+    function toggle(): void {
+        setEnabled(!props.enabled);
+    }
+
+    function enable(): void {
+        setEnabled(true);
+    }
+
+    function disable(): void {
+        setEnabled(false);
+    }
 
     function setDynamicConfs(): void {
         Hypr.extras.applyOptions({
@@ -54,21 +75,27 @@ Singleton {
         target: Hypr
     }
 
+    Timer {
+        id: transitionCooldown
+
+        interval: 1500
+    }
+
     IpcHandler {
         function isEnabled(): bool {
             return props.enabled;
         }
 
         function toggle(): void {
-            props.enabled = !props.enabled;
+            root.toggle();
         }
 
         function enable(): void {
-            props.enabled = true;
+            root.enable();
         }
 
         function disable(): void {
-            props.enabled = false;
+            root.disable();
         }
 
         target: "gameMode"
