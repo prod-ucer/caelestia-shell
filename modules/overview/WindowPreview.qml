@@ -28,15 +28,21 @@ StyledClippingRect {
     readonly property int workspaceColumn: Math.max(0, workspaceIndex % controller.columns)
     readonly property int workspaceRow: Math.max(0, Math.floor(workspaceIndex / controller.columns))
     readonly property var geometry: client?.lastIpcObject ?? ({})
+    readonly property var sourceMonitor: client?.monitor?.lastIpcObject ?? ({})
+    readonly property var sourceReserved: sourceMonitor.reserved ?? [0, 0, 0, 0]
+    readonly property real sourceUsableX: (sourceMonitor.x ?? controller.usableX) + (sourceReserved[0] ?? 0)
+    readonly property real sourceUsableY: (sourceMonitor.y ?? controller.usableY) + (sourceReserved[1] ?? 0)
+    readonly property real sourceUsableWidth: Math.max(1, (sourceMonitor.width ?? controller.usableWidth) - (sourceReserved[0] ?? 0) - (sourceReserved[2] ?? 0))
+    readonly property real sourceUsableHeight: Math.max(1, (sourceMonitor.height ?? controller.usableHeight) - (sourceReserved[1] ?? 0) - (sourceReserved[3] ?? 0))
     readonly property var windowPosition: geometry.at ?? [controller.usableX, controller.usableY]
     readonly property var windowSize: geometry.size ?? [320, 180]
-    readonly property real scaleX: workspaceWidth / controller.usableWidth
-    readonly property real scaleY: workspaceHeight / controller.usableHeight
+    readonly property real scaleX: workspaceWidth / sourceUsableWidth
+    readonly property real scaleY: workspaceHeight / sourceUsableHeight
     readonly property real edgePadding: 4
     readonly property real previewWidth: Math.max(36, Math.min(workspaceWidth - edgePadding * 2, windowSize[0] * scaleX))
     readonly property real previewHeight: Math.max(28, Math.min(workspaceHeight - edgePadding * 2, windowSize[1] * scaleY))
-    readonly property real geometryLocalX: Math.max(edgePadding, Math.min(workspaceWidth - previewWidth - edgePadding, (windowPosition[0] - controller.usableX) * scaleX))
-    readonly property real geometryLocalY: Math.max(edgePadding, Math.min(workspaceHeight - previewHeight - edgePadding, (windowPosition[1] - controller.usableY) * scaleY))
+    readonly property real geometryLocalX: Math.max(edgePadding, Math.min(workspaceWidth - previewWidth - edgePadding, (windowPosition[0] - sourceUsableX) * scaleX))
+    readonly property real geometryLocalY: Math.max(edgePadding, Math.min(workspaceHeight - previewHeight - edgePadding, (windowPosition[1] - sourceUsableY) * scaleY))
     readonly property real localX: pendingLocalX >= 0 ? pendingLocalX : geometryLocalX
     readonly property real localY: pendingLocalY >= 0 ? pendingLocalY : geometryLocalY
     readonly property real canonicalX: workspaceColumn * (workspaceWidth + workspaceSpacing) + localX

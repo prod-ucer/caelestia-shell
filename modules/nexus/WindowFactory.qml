@@ -10,8 +10,32 @@ import qs.modules.nexus
 Singleton {
     id: root
 
+    property var currentWindow
+
+    function activeScreen(): var {
+        const monitor = Hypr.focusedMonitor;
+        return Screens.screens.find(screen => Hypr.monitorFor(screen) === monitor) ?? null;
+    }
+
     function create(parent: Item, props: var): void {
-        nexusComp.createObject(parent ?? dummy, props);
+        const requested = props ?? ({});
+        if (!requested.screen)
+            requested.screen = activeScreen();
+        const window = nexusComp.createObject(parent ?? dummy, requested);
+        if (window)
+            currentWindow = window;
+    }
+
+    function toggle(): void {
+        const screen = activeScreen();
+        if (currentWindow) {
+            const sameScreen = currentWindow.screen === screen;
+            currentWindow.destroy();
+            currentWindow = null;
+            if (sameScreen)
+                return;
+        }
+        create(null, { screen });
     }
 
     QtObject {
@@ -31,12 +55,16 @@ Singleton {
                 if (!visible)
                     destroy();
             }
+            Component.onDestruction: {
+                if (root.currentWindow === win)
+                    root.currentWindow = null;
+            }
 
             implicitWidth: nexus.implicitWidth
             implicitHeight: nexus.implicitHeight
 
-            minimumSize.width: contentItem.Tokens.sizes.nexus.minWidth
-            minimumSize.height: contentItem.Tokens.sizes.nexus.minHeight
+            minimumSize.width: Math.min(contentItem.Tokens.sizes.nexus.minWidth, screen.width * 0.9)
+            minimumSize.height: Math.min(contentItem.Tokens.sizes.nexus.minHeight, screen.height * 0.9)
 
             contentItem.Config.screen: screen.name
             contentItem.Tokens.screen: screen.name

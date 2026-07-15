@@ -13,6 +13,7 @@ import qs.utils
 Item {
     id: root
 
+    required property bool dashboardActive
     property real playerProgress: {
         const active = Players.active;
         return active?.length ? (active.position % active.length) / active.length : 0;
@@ -31,15 +32,18 @@ Item {
     }
 
     Timer {
-        running: Players.active?.isPlaying ?? false
+        running: root.dashboardActive && (Players.active?.isPlaying ?? false)
         interval: GlobalConfig.dashboard.mediaUpdateInterval
         triggeredOnStart: true
         repeat: true
         onTriggered: Players.active?.positionChanged()
     }
 
-    ServiceRef {
-        service: Audio.beatTracker
+    Loader {
+        active: root.dashboardActive
+        sourceComponent: ServiceRef {
+            service: Audio.beatTracker
+        }
     }
 
     CircularProgress {
@@ -57,11 +61,13 @@ Item {
         wavy: true
         waveFrequency: 8
         waveDuration: 2000
-        wavePaused: !Players.active?.isPlaying
+        wavePaused: !root.dashboardActive || !Players.active?.isPlaying
     }
 
     CoverArt {
         id: cover
+
+        animationsActive: root.dashboardActive
 
         anchors.top: parent.top
         anchors.left: parent.left

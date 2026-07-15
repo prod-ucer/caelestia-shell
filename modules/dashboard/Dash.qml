@@ -10,6 +10,7 @@ GridLayout {
 
     required property ScreenState screenState
     required property FileDialog facePicker
+    required property bool dashboardActive
 
     rowSpacing: Tokens.spacing.medium
     columnSpacing: Tokens.spacing.medium
@@ -95,6 +96,8 @@ GridLayout {
 
         Media {
             id: media
+
+            dashboardActive: root.dashboardActive
         }
     }
 

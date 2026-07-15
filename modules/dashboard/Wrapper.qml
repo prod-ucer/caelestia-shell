@@ -70,6 +70,7 @@ Item {
         sourceComponent: Content {
             screenState: root.screenState
             facePicker: root.facePicker
+            dashboardActive: root.shouldBeActive
         }
     }
 }

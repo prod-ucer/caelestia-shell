@@ -46,10 +46,6 @@ FocusScope {
     signal cancelDragRequested(string address)
 
     readonly property list<var> clients: {
-        const monitorId = monitor?.id;
-        if (monitorId === undefined || monitorId === null)
-            return [];
-
         const firstWorkspace = workspaceGroup * workspacesShown + 1;
         const lastWorkspace = firstWorkspace + workspacesShown - 1;
         return Hypr.toplevels.values.filter(client => {
@@ -62,7 +58,6 @@ FocusScope {
                 && data?.mapped !== false
                 && workspaceId >= firstWorkspace
                 && workspaceId <= lastWorkspace
-                && client?.monitor?.id === monitorId
                 && !className.includes("caelestia")
                 && !className.includes("quickshell");
         });

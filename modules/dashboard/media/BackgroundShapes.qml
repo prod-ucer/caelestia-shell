@@ -19,6 +19,7 @@ Item {
     property real maxRotSpeed: 12
     property list<real> lightOpacities: [0.34, 0.34, 0.08, 0.2]
     property list<real> darkOpacities: [0.16, 0.16, 0.04, 0.16]
+    property bool animationsActive: true
 
     function rand(min: real, max: real): real {
         return min + Math.random() * (max - min);
@@ -38,7 +39,7 @@ Item {
     }
 
     FrameAnimation {
-        running: root.visible && root.width > 0 && root.height > 0 && (Players.active?.isPlaying ?? false)
+        running: root.animationsActive && root.visible && root.width > 0 && root.height > 0 && (Players.active?.isPlaying ?? false)
         onTriggered: {
             const dt = frameTime;
             for (let i = 0; i < shapes.count; i++) {

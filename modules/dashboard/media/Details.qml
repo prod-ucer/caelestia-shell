@@ -10,6 +10,7 @@ import qs.services
 ColumnLayout {
     id: root
 
+    property bool animationsActive: true
     function lengthStr(length: int): string {
         if (length < 0)
             return "-1:-1";
@@ -26,7 +27,7 @@ ColumnLayout {
     spacing: Tokens.spacing.extraSmall
 
     Timer {
-        running: Players.active?.isPlaying ?? false
+        running: root.animationsActive && (Players.active?.isPlaying ?? false)
         interval: GlobalConfig.dashboard.mediaUpdateInterval
         triggeredOnStart: true
         repeat: true
@@ -88,7 +89,7 @@ ColumnLayout {
             value: Players.active ? Players.active.position / (Players.active.length || 1) : 0
             enabled: Players.active?.canSeek ?? false
             wavy: true
-            animateWave: Players.active?.isPlaying ?? false
+            animateWave: root.animationsActive && (Players.active?.isPlaying ?? false)
             waveFrequency: 5
             waveDuration: 2000
             interactionOnMove: false

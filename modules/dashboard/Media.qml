@@ -10,12 +10,14 @@ Item {
     id: root
 
     required property ScreenState screenState
+    required property bool dashboardActive
 
     implicitWidth: Tokens.sizes.dashboard.mediaTabWidth
     implicitHeight: Tokens.sizes.dashboard.mediaTabHeight
 
     BackgroundShapes {
         anchors.fill: parent
+        animationsActive: root.dashboardActive
     }
 
     RowLayout {
@@ -26,6 +28,7 @@ Item {
         CoverVisualiser {
             Layout.fillHeight: true
             implicitWidth: Tokens.sizes.dashboard.mediaSectionWidth
+            animationsActive: root.dashboardActive
         }
 
         Item {
@@ -138,6 +141,7 @@ Item {
 
                     Details {
                         Layout.fillWidth: true
+                        animationsActive: root.dashboardActive
                     }
 
                     LyricsAndSelector {

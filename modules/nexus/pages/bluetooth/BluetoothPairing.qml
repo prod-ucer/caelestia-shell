@@ -97,8 +97,12 @@ PageBase {
 
                 Connections {
                     function onPairedChanged(): void {
-                        if (newDevice.wasPairing && newDevice.modelData?.paired)
+                        if (newDevice.wasPairing && newDevice.modelData?.paired) {
+                            const pairedDevice = newDevice.modelData;
+                            pairedDevice.trusted = true;
+                            Qt.callLater(() => pairedDevice.connected = true);
                             root.nState.closeSubPage();
+                        }
                     }
 
                     target: newDevice.modelData

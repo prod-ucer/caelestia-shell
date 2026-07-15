@@ -10,6 +10,7 @@ import "modules/background"
 import "modules/areapicker"
 import "modules/lock"
 import "modules/overview"
+import "modules/clipboard"
 import QtQuick
 import Quickshell
 import qs.services
@@ -31,6 +32,7 @@ ShellRoot {
     Drawers {}
     AreaPicker {}
     Overview {}
+    Clipboard {}
     Lock {
         id: lock
     }

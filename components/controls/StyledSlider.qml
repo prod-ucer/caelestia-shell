@@ -17,6 +17,8 @@ Slider {
     property int waveDuration: 1000
     property int radius: Tokens.rounding.medium
     property bool interactionOnMove: true
+    property bool animateChanges: true
+    property real wheelStep: GlobalConfig.services.audioIncrement
     readonly property bool dragging: mouse.pressed
 
     property color fgColour: enabled ? Colours.palette.m3primary : Qt.alpha(Colours.palette.m3onSurface, 0.38)
@@ -180,14 +182,22 @@ Slider {
             const clickPos = e.x / width;
             const finalPos = mouse.dragMovement !== 0 ? posBinding.value : CUtils.clamp(clickPos, 0, 1);
             root.interaction(finalPos);
-            widthBehavior.enabled = true;
+            widthBehavior.enabled = root.animateChanges;
             dragMovement = 0;
+        }
+        onWheel: event => {
+            if (event.angleDelta.y > 0)
+                root.interaction(Math.min(root.to, root.value + root.wheelStep));
+            else if (event.angleDelta.y < 0)
+                root.interaction(Math.max(root.from, root.value - root.wheelStep));
+            event.accepted = true;
         }
     }
 
     Behavior on filledWidth {
         id: widthBehavior
 
+        enabled: root.animateChanges
         Anim {}
     }
 }

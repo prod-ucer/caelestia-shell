@@ -8,6 +8,9 @@ import Caelestia.Config
 Singleton {
     id: root
 
+    // This fork does not use the mail widget. Keep the backend inert even if a
+    // default bar entry or another component references the singleton.
+    readonly property bool enabled: false
     property var unreadEmails: []
 
     property int refCount
@@ -15,7 +18,7 @@ Singleton {
     reloadableId: "mailText"
 
     Timer {
-        running: root.refCount > 0
+        running: root.enabled && root.refCount > 0
         interval: 5000
         repeat: true
         triggeredOnStart: true
@@ -27,7 +30,7 @@ Singleton {
     Process {
         id: getUnreadEmails
 
-        running: true
+        running: root.enabled
         command: GlobalConfig.bar.mail.fetchCommand
         // qmllint disable incompatible-type
         environment: ({

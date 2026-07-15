@@ -17,6 +17,18 @@ PageBase {
     readonly property bool connected: device?.state === BluetoothDeviceState.Connected // qmllint disable unresolved-type
     readonly property bool loading: device?.state === BluetoothDeviceState.Connecting || device?.state === BluetoothDeviceState.Disconnecting // qmllint disable unresolved-type
 
+    function setConnected(connected: bool): void {
+        if (!device)
+            return;
+        if (connected && device.bonded && !device.trusted) {
+            device.trusted = true;
+            const currentDevice = device;
+            Qt.callLater(() => currentDevice.connected = true);
+        } else {
+            device.connected = connected;
+        }
+    }
+
     readonly property string statusText: {
         if (!device)
             return "";
@@ -101,7 +113,7 @@ PageBase {
                 implicitWidth: connectBtnContent.implicitWidth + Tokens.padding.extraLarge * 2
                 implicitHeight: connectBtnContent.implicitHeight + Tokens.padding.medium * 2
 
-                onClicked: root.device.connected = !root.connected
+                onClicked: root.setConnected(!root.connected)
 
                 AnimLoader {
                     id: connectBtnContent

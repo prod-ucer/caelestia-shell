@@ -121,6 +121,7 @@ StyledWindow {
             const s = root.screenState;
             const conf = root.contentItem.Config;
             if (((s.launcher || panels.launcher.visible) && conf.launcher.enabled)
+                    || s.clipboard || panels.clipboard.visible
                     || ((s.session || panels.session.visible) && conf.session.enabled)
                     || (s.sidebar && conf.sidebar.enabled))
                 return true;
@@ -136,6 +137,7 @@ StyledWindow {
             root.screenState.session = false;
             root.screenState.sidebar = false;
             root.screenState.dashboard = false;
+            root.screenState.clipboard = false;
             panels.popouts.hasCurrent = false;
             bar.closeTray();
         }
@@ -192,6 +194,13 @@ StyledWindow {
             id: launcherBg
 
             panel: panels.launcher
+            deformAmount: 0.1
+        }
+
+        PanelBg {
+            id: clipboardBg
+
+            panel: panels.clipboard
             deformAmount: 0.1
         }
 
@@ -281,6 +290,9 @@ StyledWindow {
             }
             launcher.transform: Matrix4x4 {
                 matrix: launcherBg.deformMatrix
+            }
+            clipboard.transform: Matrix4x4 {
+                matrix: clipboardBg.deformMatrix
             }
             session.transform: Matrix4x4 {
                 matrix: sessionBg.deformMatrix

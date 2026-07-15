@@ -14,6 +14,7 @@ Item {
 
     required property ScreenState screenState
     required property FileDialog facePicker
+    required property bool dashboardActive
 
     readonly property var dashboardTabs: {
         const allTabs = [
@@ -158,6 +159,7 @@ Item {
                 Dash {
                     screenState: root.screenState
                     facePicker: root.facePicker
+                    dashboardActive: root.dashboardActive
                 }
             }
 
@@ -166,6 +168,7 @@ Item {
 
                 Media {
                     screenState: root.screenState
+                    dashboardActive: root.dashboardActive
                 }
             }
 

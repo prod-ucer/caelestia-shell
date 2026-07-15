@@ -28,6 +28,16 @@ Singleton {
         return null;
     }
 
+    function toggleClipboard(): void {
+        const active = forActive();
+        if (!active)
+            return;
+        const shouldOpen = !active.clipboard;
+        for (const state of states.instances)
+            state.clipboard = false;
+        active.clipboard = shouldOpen;
+    }
+
     function componentsFor(screen: ShellScreen): Components {
         for (const c of components.instances)
             if (c.modelData === screen)

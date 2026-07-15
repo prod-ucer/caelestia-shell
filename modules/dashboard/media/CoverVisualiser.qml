@@ -13,13 +13,17 @@ import qs.services
 Item {
     id: root
 
+    property bool animationsActive: true
     readonly property real centerX: width / 2
     readonly property real centerY: height / 2
     readonly property real spacing: Tokens.spacing.medium
     readonly property real maxMagnitude: (implicitWidth - cover.implicitWidth) / 2 - spacing
 
-    ServiceRef {
-        service: Audio.cava
+    Loader {
+        active: root.animationsActive
+        sourceComponent: ServiceRef {
+            service: Audio.cava
+        }
     }
 
     Shape {
@@ -73,6 +77,8 @@ Item {
 
     CoverArt {
         id: cover
+
+        animationsActive: root.animationsActive
 
         anchors.centerIn: parent
         shape.shape: MaterialShape.Cookie9Sided

@@ -15,6 +15,15 @@ ColumnLayout {
 
     required property PopoutState popouts
 
+    function setConnected(device: BluetoothDevice, connected: bool): void {
+        if (connected && device.bonded && !device.trusted) {
+            device.trusted = true;
+            Qt.callLater(() => device.connected = true);
+        } else {
+            device.connected = connected;
+        }
+    }
+
     width: 300
     spacing: Tokens.spacing.small
 
@@ -128,7 +137,7 @@ ColumnLayout {
                 StateLayer {
                     color: device.modelData.state === BluetoothDeviceState.Connected ? Colours.palette.m3onPrimary : Colours.palette.m3onSurface // qmllint disable unresolved-type
                     disabled: device.loading
-                    onClicked: device.modelData.connected = !device.modelData.connected
+                    onClicked: root.setConnected(device.modelData, !device.modelData.connected)
                 }
 
                 MaterialIcon {

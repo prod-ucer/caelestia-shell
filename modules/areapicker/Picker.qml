@@ -8,6 +8,7 @@ import Caelestia
 import qs.components
 import qs.components.effects
 import qs.services
+import qs.utils
 
 MouseArea {
     id: root
@@ -72,13 +73,19 @@ MouseArea {
     }
 
     function save(): void {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `Screenshot-${timestamp}.png`;
+        const midpoint = Math.floor(filename.length / 2);
+        const breakAt = filename.indexOf("-", midpoint);
+        const displayName = breakAt >= 0 ? `${filename.slice(0, breakAt + 1)}\n${filename.slice(breakAt + 1)}` : filename;
+        const destination = `${Paths.pictures}/Screenshots/${filename}`;
         const tmpfile = Qt.resolvedUrl(`/tmp/caelestia-picker-${Quickshell.processId}-${Date.now()}.png`);
         CUtils.saveItem(screencopy, tmpfile, Qt.rect(Math.ceil(rsx), Math.ceil(rsy), Math.floor(sw), Math.floor(sh)), path => {
             if (root.loader.clipboardOnly) {
                 Quickshell.execDetached(["sh", "-c", "wl-copy --type image/png < " + path]);
                 Quickshell.execDetached(["notify-send", "-a", "caelestia-cli", "-i", path, "Screenshot taken", "Screenshot copied to clipboard"]);
             } else {
-                Quickshell.execDetached(["swappy", "-f", path]);
+                Quickshell.execDetached(["sh", "-c", `mkdir -p "$(dirname "$2")"; cp -- "$1" "$2" || exit; wl-copy --type image/png < "$2"; action=$(notify-send --wait -a caelestia-cli -i "$2" -A default=Edit -A open=Open "Screenshot saved" "$3"); case "$action" in default) swappy -f "$2" ;; open) xdg-open "$2" ;; esac; rm -f -- "$1"`, "sh", path, destination, `Saved as\n${displayName}`]);
             }
             closeAnim.start();
         });
