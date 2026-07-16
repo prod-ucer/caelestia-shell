@@ -17,7 +17,7 @@ Item {
     readonly property HyprlandMonitor monitor: Hypr.monitorFor(screen)
     readonly property string activeSpecial: (GlobalConfig.bar.workspaces.perMonitorWorkspaces ? monitor : Hypr.focusedMonitor)?.lastIpcObject.specialWorkspace?.name ?? ""
 
-    layer.enabled: true
+    layer.enabled: false
     layer.effect: Mask {
         maskSource: mask
     }

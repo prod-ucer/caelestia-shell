@@ -23,6 +23,7 @@ StyledWindow {
 
     readonly property HyprlandMonitor monitor: Hypr.monitorFor(screen)
     readonly property bool hasSpecialWorkspace: (monitor?.lastIpcObject.specialWorkspace?.name.length ?? 0) > 0
+    readonly property int activeWorkspaceId: monitor?.activeWorkspace?.id ?? -1
     readonly property bool hasFullscreenOnNormalWs: monitor?.activeWorkspace?.toplevels.values.some(t => t.lastIpcObject.fullscreen > 1) ?? false
     readonly property bool hasFullscreen: {
         if (hasSpecialWorkspace) {
@@ -43,6 +44,17 @@ StyledWindow {
     readonly property real borderLayoutThickness: hasFullscreen ? 0 : contentItem.Config.border.thickness
 
     property color surfaceColour: Colours.tPalette.m3surface
+    property bool refreshFrame
+    readonly property bool continuousUpdates: updateBurst.running || interactions.containsMouse || focusGrab.active
+        || screenState.launcher || screenState.session || screenState.dashboard || screenState.sidebar
+        || screenState.utilities || screenState.clipboard || screenState.osd
+        || panels.launcher.visible || panels.session.visible || panels.dashboard.visible || panels.sidebar.visible
+        || panels.utilities.visible || panels.clipboard.visible || panels.osd.visible
+        || panels.popouts.hasCurrent || panels.popouts.isDetached
+
+    function wakeUpdates(): void {
+        updateBurst.restart();
+    }
 
     readonly property int dragMaskPadding: {
         if (focusGrab.active || panels.popouts.isDetached)
@@ -59,13 +71,19 @@ StyledWindow {
     }
 
     onHasFullscreenChanged: {
+        wakeUpdates();
         screenState.launcher = false;
         screenState.session = false;
         screenState.dashboard = false;
         panels.popouts.close();
     }
 
+    onHasSpecialWorkspaceChanged: wakeUpdates()
+    onActiveWorkspaceIdChanged: wakeUpdates()
+    onSurfaceColourChanged: wakeUpdates()
+
     name: "drawers"
+    updatesEnabled: continuousUpdates || refreshFrame
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: (fsTransitionProg > 0 && contentItem.Config.general.showOverFullscreen) || (hasSpecialWorkspace && hasFullscreenOnNormalWs) ? WlrLayer.Overlay : WlrLayer.Top
     // Keep keyboard ownership until focus-taking drawers finish closing. If it
@@ -88,6 +106,44 @@ StyledWindow {
 
     Behavior on surfaceColour {
         CAnim {}
+    }
+
+    Timer {
+        id: updateBurst
+
+        interval: 750
+    }
+
+    Timer {
+        interval: 250
+        repeat: true
+        running: !root.continuousUpdates
+        triggeredOnStart: true
+        onTriggered: {
+            root.refreshFrame = true;
+            endRefresh.restart();
+        }
+    }
+
+    Timer {
+        id: endRefresh
+
+        interval: 20
+        onTriggered: root.refreshFrame = false
+    }
+
+    Connections {
+        target: panels.notifications
+        function onImplicitHeightChanged(): void {
+            root.wakeUpdates();
+        }
+    }
+
+    Connections {
+        target: Hypr
+        function onActiveToplevelChanged(): void {
+            root.wakeUpdates();
+        }
     }
 
     Region {
