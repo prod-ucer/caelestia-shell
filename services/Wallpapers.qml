@@ -30,7 +30,7 @@ Searcher {
     }
 
     function setRandom(): void {
-        Quickshell.execDetached(["caelestia", "wallpaper", "-r", ...smartArg]);
+        Quickshell.execDetached([`${Paths.home}/.local/bin/caelestia-random-wallpaper-on-boot`, "--manual"]);
     }
 
     function setWallpaper(path: string): void {

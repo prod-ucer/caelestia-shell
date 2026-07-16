@@ -21,16 +21,7 @@ Searcher {
     Variants {
         id: variants
 
-        model: {
-            const actions = GlobalConfig.launcher.actions.filter(a => (a.enabled ?? true) && (GlobalConfig.launcher.enableDangerousActions || !(a.dangerous ?? false)));
-            actions.push({
-                name: qsTr("Toggle mirror view"),
-                icon: "screen_share",
-                description: qsTr("Mirror the laptop to the connected external display"),
-                command: [Quickshell.env("HOME") + "/.local/bin/caelestia-toggle-mirror"]
-            });
-            return actions;
-        }
+        model: GlobalConfig.launcher.actions.filter(a => (a.enabled ?? true) && (GlobalConfig.launcher.enableDangerousActions || !(a.dangerous ?? false)))
 
         Action {}
     }
@@ -53,6 +44,9 @@ Searcher {
             } else if (command[0] === "setMode" && command.length > 1) {
                 list.screenState.launcher = false;
                 Colours.setMode(command[1]);
+            } else if (command.join(" ") === "caelestia wallpaper -r") {
+                list.screenState.launcher = false;
+                Wallpapers.setRandom();
             } else {
                 list.screenState.launcher = false;
                 if (!SessionManager.exec(command))

@@ -15,11 +15,12 @@ IMAGE_EXTENSIONS = {
 
 
 def main() -> int:
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4) or (len(sys.argv) == 4 and sys.argv[3] != "--manual"):
         return 2
 
     wallpaper_dir = Path(sys.argv[1]).expanduser()
     state_path = Path(sys.argv[2]).expanduser()
+    manual = len(sys.argv) == 4
     boot_id = Path("/proc/sys/kernel/random/boot_id").read_text().strip()
 
     # Hyprland starts the selector early while Wallpapers.qml retains a
@@ -36,7 +37,7 @@ def main() -> int:
         pass
 
     # A shell restart during the same OS boot must not advance the queue.
-    if state.get("bootId") == boot_id:
+    if not manual and state.get("bootId") == boot_id:
         return 0
 
     wallpapers = sorted(
