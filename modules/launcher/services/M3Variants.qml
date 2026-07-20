@@ -21,6 +21,12 @@ Searcher {
             description: qsTr("A high chroma palette. The primary palette's chroma is at maximum.")
         },
         Variant {
+            variant: "vibrantspot"
+            icon: "colors"
+            name: qsTr("Vibrant Spot")
+            description: qsTr("Tonal Spot with extra wallpaper accents, falling back for muted wallpapers.")
+        },
+        Variant {
             variant: "tonalspot"
             icon: "android"
             name: qsTr("Tonal Spot")
