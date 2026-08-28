@@ -14,10 +14,29 @@ Scope {
 
         signal unlock
 
+        onLockedChanged: {
+            if (locked)
+                lockInputMethod.running = true;
+            else
+                unlockInputMethod.running = true;
+        }
+
         LockSurface {
             lock: lock
             pam: pam
         }
+    }
+
+    Process {
+        id: lockInputMethod
+
+        command: [Quickshell.env("HOME") + "/.local/bin/im-lock-english", "lock"]
+    }
+
+    Process {
+        id: unlockInputMethod
+
+        command: [Quickshell.env("HOME") + "/.local/bin/im-lock-english", "unlock"]
     }
 
     Pam {

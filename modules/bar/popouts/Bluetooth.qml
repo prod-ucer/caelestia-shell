@@ -16,12 +16,7 @@ ColumnLayout {
     required property PopoutState popouts
 
     function setConnected(device: BluetoothDevice, connected: bool): void {
-        if (connected && device.bonded && !device.trusted) {
-            device.trusted = true;
-            Qt.callLater(() => device.connected = true);
-        } else {
-            device.connected = connected;
-        }
+        BluetoothConnection.setConnected(device, connected);
     }
 
     width: 300

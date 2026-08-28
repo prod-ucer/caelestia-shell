@@ -8,6 +8,7 @@ import Caelestia.Config
 import qs.components
 import qs.components.controls
 import qs.services
+import qs.utils
 import qs.modules.nexus.common
 
 PageBase {
@@ -18,15 +19,7 @@ PageBase {
     readonly property bool loading: device?.state === BluetoothDeviceState.Connecting || device?.state === BluetoothDeviceState.Disconnecting // qmllint disable unresolved-type
 
     function setConnected(connected: bool): void {
-        if (!device)
-            return;
-        if (connected && device.bonded && !device.trusted) {
-            device.trusted = true;
-            const currentDevice = device;
-            Qt.callLater(() => currentDevice.connected = true);
-        } else {
-            device.connected = connected;
-        }
+        BluetoothConnection.setConnected(device, connected);
     }
 
     readonly property string statusText: {

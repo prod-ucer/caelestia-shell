@@ -98,9 +98,10 @@ PageBase {
                 Connections {
                     function onPairedChanged(): void {
                         if (newDevice.wasPairing && newDevice.modelData?.paired) {
-                            const pairedDevice = newDevice.modelData;
-                            pairedDevice.trusted = true;
-                            Qt.callLater(() => pairedDevice.connected = true);
+                            // pair -> trust -> connect, all after pairing completes.
+                            // Synchronous (no Qt.callLater) so the connect survives closeSubPage.
+                            newDevice.modelData.trusted = true;
+                            newDevice.modelData.connected = true;
                             root.nState.closeSubPage();
                         }
                     }

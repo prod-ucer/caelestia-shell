@@ -24,20 +24,43 @@ StyledRect {
     color: Colours.tPalette.m3surfaceContainer
     radius: Tokens.rounding.full
 
-    focus: true
-    onActiveFocusChanged: {
-        if (!activeFocus)
-            forceActiveFocus();
-    }
+    TextInput {
+        id: passwordEditor
 
-    Keys.onPressed: event => {
-        if (root.lock.unlocking)
-            return;
+        anchors.fill: parent
+        opacity: 0
+        focus: true
+        echoMode: TextInput.Password
+        inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
 
-        if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)
-            inputField.placeholder.animate = false;
+        onActiveFocusChanged: {
+            if (!activeFocus)
+                forceActiveFocus();
+        }
+        onTextChanged: {
+            if (root.lock.pam.buffer !== text)
+                root.lock.pam.buffer = text;
+        }
 
-        root.lock.pam.handleKey(event);
+        Keys.onPressed: event => {
+            if (root.lock.unlocking)
+                return;
+
+            if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
+                inputField.placeholder.animate = false;
+                root.lock.pam.handleKey(event);
+                event.accepted = true;
+            }
+        }
+
+        Connections {
+            function onBufferChanged(): void {
+                if (passwordEditor.text !== root.lock.pam.buffer)
+                    passwordEditor.text = root.lock.pam.buffer;
+            }
+
+            target: root.lock.pam
+        }
     }
 
     Behavior on implicitWidth {
@@ -47,7 +70,7 @@ StyledRect {
     StateLayer {
         hoverEnabled: false
         cursorShape: Qt.IBeamCursor
-        onClicked: parent.forceActiveFocus()
+        onClicked: passwordEditor.forceActiveFocus()
     }
 
     RowLayout {

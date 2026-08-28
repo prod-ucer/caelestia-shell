@@ -73,7 +73,7 @@ PageBase {
                     onClicked: {
                         if (!device.modelData || device.loading)
                             return;
-                        device.modelData.connected = !device.connected;
+                        BluetoothConnection.setConnected(device.modelData, !device.connected);
                     }
                 }
 
